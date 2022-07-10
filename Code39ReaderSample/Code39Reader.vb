@@ -1,4 +1,6 @@
 ﻿Option Strict On
+Imports System.Dynamic
+Imports System.Linq.Expressions
 
 <Guid("1FA2E199-DC60-48E7-A08B-F6F17F4E0439")>
 <ComVisible(True)>
@@ -7,18 +9,19 @@
 <ProgId("Orator.Code39Reader")>
 Public Class Code39Reader
     Implements ICode39Reader
-    Private ReadOnly reader As IBarcodeReader
 
+    Private ReadOnly reader As IBarcodeReader
     Public ReadOnly Property Options As IReaderOptions Implements ICode39Reader.Options
     Public Sub New()
         reader = New BarcodeReader()
         reader.Options.PossibleFormats = New BarcodeFormat(0) {BarcodeFormat.CODE_39}
         reader.Options.AssumeCode39CheckDigit = False
         reader.Options.TryHarder = True
-        Options = New ReaderOptions(reader.Options)
+        _Options = New ReaderOptions(reader.Options)
     End Sub
 
-    Public Function ReadFromFile(filePath As String) As <MarshalAs(UnmanagedType.SafeArray)> String() Implements ICode39Reader.ReadFromFile
+    <ComVisible(False)>
+    Public Function ReadFromFile(filePath As String) As String()
         Dim codeList As New List(Of String)()
         DirectCast(Options, ReaderOptions).Fill(reader.Options)
         For Each bmp In GetBitmaps(filePath)
@@ -33,6 +36,10 @@ Public Class Code39Reader
             bmp.Dispose()
         Next
         Return codeList.ToArray()
+    End Function
+
+    Private Function ReadFromFile(filePath As Object) As Object Implements ICode39Reader.ReadFromFile
+        Return Array.ConvertAll(ReadFromFile(CStr(filePath)), Function(s) CObj(s))
     End Function
 
     Private Function GetBitmaps(filePath As String) As Bitmap()

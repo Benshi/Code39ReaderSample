@@ -2,5 +2,5 @@
 <InterfaceType(ComInterfaceType.InterfaceIsDual)>
 Public Interface ICode39Reader
     ReadOnly Property Options As IReaderOptions
-    Function ReadFromFile(filePath As String) As <MarshalAs(UnmanagedType.SafeArray)> String()
+    Function ReadFromFile(filePath As Object) As Object
 End Interface
